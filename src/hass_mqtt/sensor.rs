@@ -215,6 +215,15 @@ impl EntityInstance for CapabilitySensor {
                         None => "".to_string(),
                     }
                 }
+                // Without this arm, serde falls through to cap.state.to_string()
+                // which publishes {"value":830} — HA device_class carbon_dioxide
+                // requires a plain number and marks the entity unavailable.
+                "carbonDioxideConcentration" => {
+                    match cap.state.pointer("/value").and_then(|v| v.as_f64()) {
+                        Some(v) => format!("{v:.0}"),
+                        None => "".to_string(),
+                    }
+                }
                 _ => cap.state.to_string(),
             };
 

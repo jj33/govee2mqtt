@@ -280,10 +280,14 @@ fn load_quirks() -> HashMap<String, Quirk> {
             .with_platform_humidity_sensor_units(HumidityUnits::RelativePercent)
             .with_iot_api_support(true),
         // <https://github.com/wez/govee2mqtt/issues/561>
+        // NOTE: H5106 is BLE-primary but does respond on the Platform/HTTP API.
+        // ble_only=true causes is_controllable() to return false, which makes
+        // enumerate_entities_for_device() bail before adding any entities.
+        // Dropping ble_only (like H5140) allows temp/humidity/air-quality entities
+        // to enumerate and receive live values via the Platform API.
         Quirk::air_quality_monitor("H5106")
             .with_platform_temperature_sensor_units(TemperatureUnits::Fahrenheit)
             .with_platform_humidity_sensor_units(HumidityUnits::RelativePercent)
-            .with_ble_only(true)
             .with_iot_api_support(true),
         Quirk::device("H7170", DeviceType::Kettle, "mdi:kettle")
             .with_platform_temperature_sensor_units(TemperatureUnits::Fahrenheit),
